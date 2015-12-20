@@ -32,6 +32,6 @@ class Kernel extends HttpKernel
 
         'user.gest' => \App\Http\Middleware\UserGestMiddleware::class,
         'user.auth' => \App\Http\Middleware\UserAuthMiddleware::class,
-        'user.admin' => \App\Http\Middleware\UserAdminMiddleware::class,
+        'user.admin' => \App\Http\Middleware\UserAdminMiddleware::class
     ];
 }

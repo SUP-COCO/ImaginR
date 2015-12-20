@@ -28,7 +28,17 @@ Route::group(['middleware' => 'user.auth'], function(){
 	Route::get('editProfil', ['uses' => 'UserController@editProfil']);
 	Route::post('editProfil', ['as' => 'post.edit', 'uses' => 'UserController@editProfil']);
 	Route::get('logout', ['as' => 'user.logout', 'uses' => 'UserController@logout']);
-	Route::get('abonnement', ['uses' => 'UserController@abonnement']);
+	Route::get('abonnement', ['uses' => 'AboController@abonnement']);
+	Route::post('abonnement', ['uses' => 'AboController@validAbo']);
+	Route::get('validations', ['uses' => 'UserController@validation']);
+
+	// Payment Route
+	Route::get('payment', ['uses' => 'PayPalController@index']);
+});
+
+Route::group(['prefix' => 'api'], function(){
+	Route::post('validCard', ['uses' => 'CardController@validCard']);
+	// Route::post('getToken', ['uses' => 'CardController@getToken']);
 });
 
 // ROUTE ADMIN
@@ -45,4 +55,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['user.auth', 'user.admin']],
 
 	Route::get('stations/delete', ['uses' => 'AdminController@deleteStation']);
 	Route::post('stations/delete', ['uses' => 'AdminController@deleteStation']);
+
+	Route::get('users/create', ['uses' => 'AdminController@createUser']);
+	Route::post('users/create', ['uses' => 'AdminController@createUser']);
 });

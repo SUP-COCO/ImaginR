@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTableCards extends Migration
+class CreateTableValidations extends Migration
 {
     /**
      * Run the migrations.
@@ -12,21 +12,19 @@ class CreateTableCards extends Migration
      */
     public function up()
     {
-        Schema::create('cards', function (Blueprint $table) {
+        Schema::create('validations', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('num_serie');
-            $table->boolean('valid');
-            $table->date('date_start')->nullable();
-            $table->date('date_end')->nullable();
-            $table->integer('user_id')->unsigned()->nullable();
+            $table->dateTime('date');
+            $table->integer('user_id')->unsigned();
+            $table->integer('station_id')->unsigned();
             $table->timestamps();
 
             $table->engine = 'InnoDB';
-            $table->unique('user_id');
         });
 
-        Schema::table('cards', function($table) {
+        Schema::table('validations', function($table) {
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('station_id')->references('id')->on('stations');
         });
     }
 
@@ -37,6 +35,6 @@ class CreateTableCards extends Migration
      */
     public function down()
     {
-        Schema::drop('cards');
+        Schema::drop('validations');
     }
 }

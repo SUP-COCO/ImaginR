@@ -227,6 +227,12 @@
 								<i class="fa fa-train"></i> <span>Stations</span> <!--<small class="label pull-right bg-green">Hot</small>-->
 							</a>
 						</li>
+
+						<li class="{{ Request::is('admin/users') ? 'active' : '' }}">
+							<a href="{{URL::to('admin/users')}}">
+								<i class="fa fa-user"></i> <span>Utilisateurs</span> <!--<small class="label pull-right bg-green">Hot</small>-->
+							</a>
+						</li>
 						<!-- <li class="treeview">
 							<a href="#">
 								<i class="fa fa-files-o"></i>

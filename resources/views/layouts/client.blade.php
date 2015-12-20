@@ -66,9 +66,15 @@
                                         Mon abonnement
                                     </a>
                                 </li>
+                                <li class="{{ Request::is('validations') ? 'active' : '' }}">
+                                    <a href="{{ URL::to('validations') }}">
+                                        <i class="glyphicon glyphicon-menu-hamburger"></i>
+                                        Mes Validations
+                                    </a>
+                                </li>
                                 <li class="{{ Request::is('transactions') ? 'active' : '' }}">
                                     <a href="{{ URL::to('transactions') }}">
-                                        <i class="glyphicon glyphicon-shopping-cart"></i>
+                                        <i class="fa fa-exchange"></i>
                                         Mes Transactions
                                     </a>
                                 </li>

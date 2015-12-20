@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTableStations extends Migration
+class CreateTableOffres extends Migration
 {
     /**
      * Run the migrations.
@@ -12,13 +12,11 @@ class CreateTableStations extends Migration
      */
     public function up()
     {
-        Schema::create('stations', function (Blueprint $table) {
+        Schema::create('offres', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->text('location');
-            $table->text('description');
-            $table->string('key');
-            $table->enum('valid', ['0', '1']);
+            $table->string('title');
+            $table->string('price');
+            $table->integer('nb_days');
             $table->timestamps();
 
             $table->engine = 'InnoDB';
@@ -32,6 +30,6 @@ class CreateTableStations extends Migration
      */
     public function down()
     {
-        Schema::drop('stations');
+        //
     }
 }

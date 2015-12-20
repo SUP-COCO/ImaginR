@@ -19,4 +19,16 @@ class Station extends Model
      * @var array
      */
     protected $fillable = ['name', 'location'];
+
+    public function checkValid(){
+        if ($this->valid) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function validation(){
+        return $this->hasOne('App\Validation');
+    }
 }

@@ -18,5 +18,19 @@ class Card extends Model
      *
      * @var array
      */
-    protected $fillable = ['num_serie', 'valid', 'date_start', 'date_end', 'user_id'];
+    protected $fillable = ['num_serie', 'date_start', 'date_end', 'user_id', 'key', 'valid'];
+
+    public function checkCard(){
+        if ($this->valid) {
+            $date_start = strtotime($this->date_start);
+            $date_end = strtotime($this->date_end);
+            $date = strtotime(date('Y-m-d'));
+
+            if($date > $date_start && $date < $date_end) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 }

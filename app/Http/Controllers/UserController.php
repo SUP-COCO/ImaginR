@@ -13,9 +13,15 @@ use Redirect;
 use Response;
 use Image;
 use DB;
+use App\User;
+use App\Validation;
+use App\Station;
 
 class UserController extends Controller
 {
+    public function __construct(Sentinel $user){
+        $this->user = Sentinel::getUser();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -61,6 +67,7 @@ class UserController extends Controller
 
     public function profil(){
         $user = Sentinel::getUser();
+        // $user = $this->user;
         $stations = DB::table('stations')->get();
         return view('users.profil', ['user' => $user, 'stations' => $stations]);
     }
@@ -199,8 +206,13 @@ class UserController extends Controller
                 $result = Sentinel::registerAndActivate($user);
 
                 if ($result) {
-                    Sentinel::authenticate(['email' => $data['email'], 'password' => $data['password']]);
-                    return Redirect::to('dashboard');
+                    $user = User::find($result['id']);
+                    $user->avatar = $data['avatar'];
+
+                    if ($user->save()) {
+                        Sentinel::authenticate(['email' => $data['email'], 'password' => $data['password']]);
+                        return Redirect::to('dashboard');
+                    }
                 }
             }
         } else {
@@ -217,64 +229,14 @@ class UserController extends Controller
         return Redirect::to('login')->with($data);       
     }
 
-    public function abonnement(){
+    public function validation() {
         $user = Sentinel::getUser();
-        return view('users.abonnement', ['user' => $user]);
-    }
+        $validations = Validation::where('user_id', $user->id)->orderBy('date', 'DESC')->get();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        foreach ($validations as $validation) {
+            $validation['station'] = $validation->validation;
+        }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return view('users.validation', ['user' => $user, 'validations' => $validations]);
     }
 }

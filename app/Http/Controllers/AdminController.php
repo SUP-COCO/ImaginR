@@ -10,6 +10,7 @@ use Sentinel;
 use DB;
 use Validator;
 use App\Station;
+use App\User;
 use Input;
 
 class AdminController extends Controller
@@ -27,12 +28,20 @@ class AdminController extends Controller
 
     public function index(){
         $user = Sentinel::getUser();
-        return view('admin.dashboard', ['user' => $user]);
+        $users = DB::table('users')->get();
+        $stations = DB::table('stations')->get();
+        return view('admin.dashboard', ['user' => $user, 'users' => $users, 'stations' => $stations]);
     }
 
     public function users(){
         $user = Sentinel::getUser();
-        $users = DB::table('users')->get();
+        $users = User::all();
+
+        foreach ($users as $key => $user) {
+            $user['card'] = $user->card;
+            $user['checkCard'] = $user['card']->checkCard();
+        }
+
         return view('admin.users', ['user' => $user, 'users' => $users]);
     }
 
@@ -66,10 +75,14 @@ class AdminController extends Controller
                 $location = ['lat' => $data['latitude'], 'lng' => $data['longitude']];
                 $location = json_encode($location);
 
+                $key = md5(microtime().rand());
+
                 $station = new Station();
                 $station->name = $data['station_name'];
                 $station->description = $data['description'];
                 $station->location = $location;
+                $station->key = $key;
+                $station->valid = 1;
 
                 if ($station->save()) {
                     $data = [
@@ -157,69 +170,45 @@ class AdminController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    public function createUser(Request $request) {
+        if ($request->isMethod('POST')) {
+            $data = Input::all();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+            $rules = [
+                'email'                 => 'unique:users|required|min:4|max:254|email',
+                'first_name'            => 'required|max:255',
+                'last_name'             => 'required|max:255',
+                'password'              => 'required|min:6|confirmed',
+                'password_confirmation' => 'required'
+            ];
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+            $validator = Validator::make($data, $rules);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+            if($validator->fails()){
+                return redirect('admin/users')
+                            ->withErrors($validator)
+                            ->withInput();
+            } else {
+                $user = [
+                    'email'         => $data['email'],
+                    'first_name'    => $data['first_name'],
+                    'last_name'     => $data['last_name'],
+                    'password'      => $data['password']
+                ];
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+                $result = Sentinel::registerAndActivate($user);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+                if ($result) {
+                    $data = [
+                        'alert' => 'success',
+                        'message_create' => "L'Utilisateur a été créer!"
+                    ];
+                    return redirect('admin/users')->with($data);
+                }
+            }
+
+        } else {
+            return redirect('admin/users');
+        }
     }
 }

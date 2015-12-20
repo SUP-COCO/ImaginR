@@ -48,7 +48,8 @@ class AboController extends Controller
                 $offre = Offre::where('id', $data['id_offre'])->first();
 
                 if($offre){
-                    return 'ok';
+                    $test = PayPal::apiContext(config('paypal.Account.ClientId'));
+                    return $test;
                 }
             }
         }
